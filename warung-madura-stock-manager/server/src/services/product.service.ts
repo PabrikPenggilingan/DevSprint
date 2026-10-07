@@ -43,8 +43,8 @@ export async function listProducts(filter: ListProductsFilter): Promise<ProductD
     ];
   }
   if (filter.inStock) {
-    where.stock = { gt: 0 };
     where.isActive = true;
+    where.stock = { gt: 0 };
   }
 
   const products = await db.product.findMany({ where, orderBy: { name: 'asc' } });

@@ -221,7 +221,7 @@ Semua perintah dijalankan dari **root repositori**.
 │   │   ├── seed.ts                   data contoh
 │   │   └── migrations/
 │   │       ├── 20261007000000_init/              migrasi awal + CHECK constraints
-│   │       └── 20261007100000_add_product_is_active/  kolom isActive
+│   │       └── 20261007010000_add_product_active_status/  kolom isActive
 │   └── src/
 │       ├── index.ts                  titik masuk (listen)
 │       ├── app.ts                    konfigurasi Express
@@ -269,7 +269,7 @@ Semua perintah dijalankan dari **root repositori**.
 | Area | File | Perubahan |
 |------|------|-----------|
 | Schema | `schema.prisma` | Kolom `isActive Boolean @default(true)` di model `Product` |
-| Migrasi | `20261007100000_add_product_is_active` | `ALTER TABLE` menambah kolom; semua produk lama otomatis aktif |
+| Migrasi | `20261007010000_add_product_active_status` | `ALTER TABLE` menambah kolom; semua produk lama otomatis aktif |
 | Server DTO | `server/src/types/dto.ts` | `isActive` di `ProductDto`; `productIsActive` di `SaleItemDto` & `StockMovementDto` |
 | Konstanta | `lib/constants.ts` | `PRODUCT_INACTIVE_MESSAGE`, `PRODUCT_INACTIVE_STOCK_MESSAGE` |
 | Validator | `product.validator.ts` | `updateProductStatusSchema` + tipe `UpdateProductStatusInput` |

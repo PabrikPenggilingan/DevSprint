@@ -235,7 +235,7 @@ export function ProductsPage() {
           title={statusTarget.isActive ? 'Nonaktifkan produk?' : 'Aktifkan produk?'}
           message={
             statusTarget.isActive
-              ? `Produk "${statusTarget.name}" tidak akan bisa dijual lagi.`
+              ? `Produk "${statusTarget.name}" akan tetap tersimpan beserta riwayatnya, tetapi tidak dapat dijual sampai diaktifkan kembali.`
               : `Produk "${statusTarget.name}" akan kembali bisa dijual.`
           }
           confirmLabel={statusTarget.isActive ? 'Nonaktifkan' : 'Aktifkan'}
@@ -248,7 +248,7 @@ export function ProductsPage() {
       {deleteTarget && (
         <ConfirmDialog
           title="Hapus produk?"
-          message={`Produk "${deleteTarget.name}" akan dihapus. Tindakan ini tidak dapat dibatalkan.`}
+          message={`Produk "${deleteTarget.name}" akan dihapus. Produk dengan riwayat transaksi atau pergerakan stok tidak dapat dihapus.`}
           confirmLabel="Hapus"
           busy={deleting}
           onConfirm={handleConfirmDelete}

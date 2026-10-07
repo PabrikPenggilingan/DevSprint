@@ -145,13 +145,19 @@ export async function createSale(input: CreateSaleInput): Promise<SaleDetailDto>
     });
 
     for (const line of lines) {
-      // 5. Decrease stock. The `stock >= quantity` condition makes the update safe even if another
-      //    sale touched the same product after step 2.
+      // 5. Recheck stock and active status in the update to protect against concurrent changes.
       const { count } = await tx.product.updateMany({
-        where: { id: line.product.id, stock: { gte: line.quantity } },
+        where: { id: line.product.id, isActive: true, stock: { gte: line.quantity } },
         data: { stock: { decrement: line.quantity } },
       });
       if (count === 0) {
+        const currentProduct = await tx.product.findUnique({
+          where: { id: line.product.id },
+          select: { isActive: true },
+        });
+        if (currentProduct && !currentProduct.isActive) {
+          throw new ConflictError(PRODUCT_INACTIVE_MESSAGE);
+        }
         throw new ConflictError(`Stok ${line.product.name} berubah dan tidak lagi mencukupi. Silakan coba lagi.`);
       }
 

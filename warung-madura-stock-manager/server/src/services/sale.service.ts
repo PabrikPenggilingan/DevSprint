@@ -1,5 +1,4 @@
 import { Prisma, StockMovementType, type Product } from '@prisma/client';
-import { PRODUCT_INACTIVE_MESSAGE } from '../lib/constants';
 import { db } from '../lib/db';
 import { endOfDayWib, formatDateKeyWib, startOfDayWib } from '../lib/dates';
 import { ConflictError, NotFoundError } from '../lib/errors';
@@ -14,7 +13,7 @@ export const saleSummaryInclude = {
 
 const saleDetailInclude = {
   items: {
-    include: { product: { select: { name: true, sku: true, isActive: true } } },
+    include: { product: { select: { name: true, sku: true } } },
     orderBy: { product: { name: 'asc' } },
   },
 } satisfies Prisma.SaleInclude;
@@ -51,7 +50,6 @@ function toSaleDetailDto(sale: SaleWithItems): SaleDetailDto {
       // The name comes from the Product relation, not from a copy stored on the sale item.
       productName: item.product.name,
       productSku: item.product.sku,
-      productIsActive: item.product.isActive,
       quantity: item.quantity,
       unitPrice: item.unitPrice.toNumber(),
       subtotal: item.subtotal.toNumber(),
@@ -109,7 +107,6 @@ export async function createSale(input: CreateSaleInput): Promise<SaleDetailDto>
     for (const item of requestedItems) {
       const product = productsById.get(item.productId);
       if (!product) throw new NotFoundError('Produk tidak ditemukan.');
-      if (!product.isActive) throw new ConflictError(PRODUCT_INACTIVE_MESSAGE);
 
       if (product.stock < item.quantity) {
         shortages.push(`${product.name} (tersedia ${product.stock})`);

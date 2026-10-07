@@ -1,5 +1,4 @@
 import { Prisma, StockMovementType } from '@prisma/client';
-import { PRODUCT_INACTIVE_STOCK_MESSAGE } from '../lib/constants';
 import { db } from '../lib/db';
 import { ConflictError, NotFoundError } from '../lib/errors';
 import type { StockMovementDto } from '../types/dto';
@@ -11,7 +10,7 @@ import type {
 const MAX_MOVEMENTS_IN_LIST = 300;
 
 const movementInclude = {
-  product: { select: { name: true, sku: true, isActive: true } },
+  product: { select: { name: true, sku: true } },
 } satisfies Prisma.StockMovementInclude;
 
 type MovementWithProduct = Prisma.StockMovementGetPayload<{ include: typeof movementInclude }>;
@@ -25,7 +24,6 @@ function toStockMovementDto(
     productId: movement.productId,
     productName: movement.product.name,
     productSku: movement.product.sku,
-    productIsActive: movement.product.isActive,
     type: movement.type,
     quantity: movement.quantity,
     beforeStock: movement.beforeStock,
@@ -43,7 +41,6 @@ export async function adjustStock(input: StockAdjustmentInput): Promise<StockMov
   return db.$transaction(async (tx) => {
     const product = await tx.product.findUnique({ where: { id: input.productId } });
     if (!product) throw new NotFoundError('Produk tidak ditemukan.');
-    if (!product.isActive) throw new ConflictError(PRODUCT_INACTIVE_STOCK_MESSAGE);
 
     if (input.type === 'OUT') {
       if (product.stock < input.quantity) {

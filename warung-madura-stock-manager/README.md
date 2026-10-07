@@ -103,10 +103,9 @@ Semua dijalankan dari root repositori.
 - Stok produk tidak diubah lewat form ubah produk. Stok berubah lewat penjualan dan penyesuaian stok; keduanya mencatat `StockMovement`.
 - Penjualan dibuat dalam satu transaksi database: validasi produk dan stok, buat `Sale` dan `SaleItem`, kurangi stok, catat `StockMovement`. Jika satu langkah gagal, semuanya dibatalkan.
 - Nomor invoice berformat `INV-YYYYMMDD-NNNN`, bernomor urut per hari (zona waktu WIB).
-- Hanya produk yang **aktif** dan dengan stok > 0 yang bisa dipilih di Penjualan Baru. Produk nonaktif ditolak dari transaksi baru dan penyesuaian stok.
-- Produk dihapus secara permanen (hard delete). Produk yang pernah dipakai di transaksi, atau sudah punya riwayat stok selain stok awal, tidak bisa dihapus dan API menjawab `409 Conflict`. Sebagai gantinya, produk ini bisa dinonaktifkan.
+- Hanya produk dengan stok > 0 yang bisa dipilih di Penjualan Baru.
+- Produk dihapus secara permanen (hard delete). Produk yang pernah dipakai di transaksi, atau sudah punya riwayat stok selain stok awal, tidak bisa dihapus dan API menjawab `409 Conflict`. Foreign key di PostgreSQL (`ON DELETE RESTRICT`) menjadi penjaga terakhir.
 - Detail penjualan menampilkan nama produk lewat relasi ke tabel `Product`.
-- Dasbor hanya menghitung produk yang aktif.
 - Migrasi awal juga memuat beberapa `CHECK` constraint (stok tidak negatif, harga, jumlah) yang ditulis manual di SQL dan tidak muncul di `schema.prisma`.
 
 ## Endpoint API
@@ -117,7 +116,6 @@ Semua dijalankan dari root repositori.
 | POST   | `/api/products`        | Tambah produk (membuat entri stok awal bila stok > 0)   |
 | GET    | `/api/products/:id`    | Detail produk                                           |
 | PATCH  | `/api/products/:id`    | Ubah SKU, nama, kategori, harga                         |
-| PATCH  | `/api/products/:id/status` | Aktifkan atau nonaktifkan produk                    |
 | DELETE | `/api/products/:id`    | Hapus produk (`409` bila punya riwayat)                 |
 | GET    | `/api/sales`           | Daftar penjualan                                        |
 | POST   | `/api/sales`           | Buat penjualan: `{ items: [{ productId, quantity }] }`  |

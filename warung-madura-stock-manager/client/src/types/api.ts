@@ -8,7 +8,6 @@ export interface Product {
   purchasePrice: number;
   sellingPrice: number;
   stock: number;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +36,6 @@ export interface SaleItem {
   productId: string;
   productName: string;
   productSku: string;
-  productIsActive: boolean;
   quantity: number;
   unitPrice: number;
   subtotal: number;
@@ -63,7 +61,6 @@ export interface StockMovement {
   productId: string;
   productName: string;
   productSku: string;
-  productIsActive: boolean;
   type: StockMovementType;
   quantity: number;
   beforeStock: number;

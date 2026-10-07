@@ -50,14 +50,6 @@ export const listProductsQuerySchema = z.object({
     .transform((value) => value === 'true'),
 });
 
-export const updateProductStatusSchema = z.object({
-  isActive: z.boolean({
-    required_error: 'Status aktif wajib diisi',
-    invalid_type_error: 'Status aktif harus berupa boolean',
-  }),
-});
-
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type ListProductsFilter = z.infer<typeof listProductsQuerySchema>;
-export type UpdateProductStatusInput = z.infer<typeof updateProductStatusSchema>;

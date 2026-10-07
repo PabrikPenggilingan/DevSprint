@@ -4,7 +4,6 @@ import {
   deleteProduct,
   getProduct,
   listProducts,
-  setProductStatus,
   updateProduct,
 } from '../services/product.service';
 import { idParamSchema } from '../validators/common.validator';
@@ -12,7 +11,6 @@ import {
   createProductSchema,
   listProductsQuerySchema,
   updateProductSchema,
-  updateProductStatusSchema,
 } from '../validators/product.validator';
 
 // Route handlers stay thin: validate input with Zod, call a service, send the result.
@@ -37,12 +35,6 @@ productRouter.patch('/:id', async (req, res) => {
   const { id } = idParamSchema.parse(req.params);
   const input = updateProductSchema.parse(req.body);
   res.json(await updateProduct(id, input));
-});
-
-productRouter.patch('/:id/status', async (req, res) => {
-  const { id } = idParamSchema.parse(req.params);
-  const input = updateProductStatusSchema.parse(req.body);
-  res.json(await setProductStatus(id, input));
 });
 
 productRouter.delete('/:id', async (req, res) => {

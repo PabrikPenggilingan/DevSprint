@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getErrorMessage } from '../api/http';
-import { deleteProduct, listProducts, setProductStatus } from '../api/products';
+import { deleteProduct, listProducts } from '../api/products';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PageHeader } from '../components/PageHeader';
 import { ProductFormModal } from '../components/ProductFormModal';
@@ -32,8 +32,6 @@ export function ProductsPage() {
   const [adjustTarget, setAdjustTarget] = useState<Product | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [statusTarget, setStatusTarget] = useState<Product | null>(null);
-  const [changingStatus, setChangingStatus] = useState(false);
 
   // Wait until the user stops typing before asking the API.
   useEffect(() => {
@@ -57,25 +55,6 @@ export function ProductsPage() {
       setDeleteTarget(null);
     } finally {
       setDeleting(false);
-    }
-  }
-
-  async function handleConfirmStatusChange() {
-    if (!statusTarget) return;
-    setChangingStatus(true);
-    const newStatus = !statusTarget.isActive;
-    try {
-      await setProductStatus(statusTarget.id, newStatus);
-      toast.success(
-        `Produk "${statusTarget.name}" berhasil ${newStatus ? 'diaktifkan' : 'dinonaktifkan'}.`
-      );
-      setStatusTarget(null);
-      reload();
-    } catch (caught) {
-      toast.error(getErrorMessage(caught));
-      setStatusTarget(null);
-    } finally {
-      setChangingStatus(false);
     }
   }
 
@@ -130,7 +109,6 @@ export function ProductsPage() {
                   <th className={`${thClass} text-right`}>Harga Beli</th>
                   <th className={`${thClass} text-right`}>Harga Jual</th>
                   <th className={`${thClass} text-right`}>Stok</th>
-                  <th className={thClass}>Status</th>
                   <th className={`${thClass} text-right`}>Aksi</th>
                 </tr>
               </thead>
@@ -153,25 +131,7 @@ export function ProductsPage() {
                         {formatNumber(product.stock)}
                       </span>
                     </td>
-                    <td className={tdClass}>
-                      {product.isActive ? (
-                        <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                          Aktif
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                          Nonaktif
-                        </span>
-                      )}
-                    </td>
                     <td className={`${tdClass} whitespace-nowrap text-right`}>
-                      <button
-                        type="button"
-                        className={btnSmall}
-                        onClick={() => setStatusTarget(product)}
-                      >
-                        {product.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-                      </button>
                       <button
                         type="button"
                         className={btnSmall}
@@ -227,21 +187,6 @@ export function ProductsPage() {
             setAdjustTarget(null);
             reload();
           }}
-        />
-      )}
-
-      {statusTarget && (
-        <ConfirmDialog
-          title={statusTarget.isActive ? 'Nonaktifkan produk?' : 'Aktifkan produk?'}
-          message={
-            statusTarget.isActive
-              ? `Produk "${statusTarget.name}" tidak akan bisa dijual lagi.`
-              : `Produk "${statusTarget.name}" akan kembali bisa dijual.`
-          }
-          confirmLabel={statusTarget.isActive ? 'Nonaktifkan' : 'Aktifkan'}
-          busy={changingStatus}
-          onConfirm={handleConfirmStatusChange}
-          onCancel={() => setStatusTarget(null)}
         />
       )}
 

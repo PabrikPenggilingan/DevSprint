@@ -22,10 +22,6 @@ export function updateProduct(id: string, input: ProductUpdateInput): Promise<Pr
   return request<Product>(`/products/${id}`, { method: 'PATCH', body: input });
 }
 
-export function setProductStatus(id: string, isActive: boolean): Promise<Product> {
-  return request<Product>(`/products/${id}/status`, { method: 'PATCH', body: { isActive } });
-}
-
 export function deleteProduct(id: string): Promise<void> {
   return request<void>(`/products/${id}`, { method: 'DELETE' });
 }

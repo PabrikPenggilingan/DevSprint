@@ -11,7 +11,6 @@ import type {
   CreateProductInput,
   ListProductsFilter,
   UpdateProductInput,
-  UpdateProductStatusInput,
 } from '../validators/product.validator';
 
 const PRODUCT_NOT_FOUND = 'Produk tidak ditemukan.';
@@ -26,7 +25,6 @@ export function toProductDto(product: Product): ProductDto {
     purchasePrice: product.purchasePrice.toNumber(),
     sellingPrice: product.sellingPrice.toNumber(),
     stock: product.stock,
-    isActive: product.isActive,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
   };
@@ -44,7 +42,6 @@ export async function listProducts(filter: ListProductsFilter): Promise<ProductD
   }
   if (filter.inStock) {
     where.stock = { gt: 0 };
-    where.isActive = true;
   }
 
   const products = await db.product.findMany({ where, orderBy: { name: 'asc' } });
@@ -102,22 +99,6 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
   } catch (error) {
     if (hasPrismaCode(error, 'P2025')) throw new NotFoundError(PRODUCT_NOT_FOUND);
     if (hasPrismaCode(error, 'P2002')) throw new ConflictError(SKU_ALREADY_USED);
-    throw error;
-  }
-}
-
-export async function setProductStatus(
-  id: string,
-  input: UpdateProductStatusInput,
-): Promise<ProductDto> {
-  try {
-    const product = await db.product.update({
-      where: { id },
-      data: { isActive: input.isActive },
-    });
-    return toProductDto(product);
-  } catch (error) {
-    if (hasPrismaCode(error, 'P2025')) throw new NotFoundError(PRODUCT_NOT_FOUND);
     throw error;
   }
 }

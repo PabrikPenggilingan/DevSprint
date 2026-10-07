@@ -7,13 +7,12 @@ import { saleSummaryInclude, toSaleSummaryDto } from './sale.service';
 
 export async function getDashboard(): Promise<DashboardDto> {
   const now = new Date();
-  const activeWhere = { isActive: true };
-  const lowStockWhere = { stock: { lte: LOW_STOCK_THRESHOLD }, isActive: true };
+  const lowStockWhere = { stock: { lte: LOW_STOCK_THRESHOLD } };
 
   const [totalProducts, stockSum, todaySales, lowStockCount, latestSales, lowStockProducts] =
     await Promise.all([
-      db.product.count({ where: activeWhere }),
-      db.product.aggregate({ _sum: { stock: true }, where: activeWhere }),
+      db.product.count(),
+      db.product.aggregate({ _sum: { stock: true } }),
       db.sale.aggregate({
         _sum: { total: true },
         where: { createdAt: { gte: startOfDayWib(now), lt: endOfDayWib(now) } },
